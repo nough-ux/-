@@ -1416,18 +1416,18 @@
                 </div>
                 <div class="contact-form fade-in">
                     <h3>أرسل رسالة</h3>
-                    <form id="contactForm">
+                    <form id="contactForm" action="https://formspree.io/f/myklyevk" method="POST">
                         <div class="form-group">
                             <label for="contactName">الاسم</label>
-                            <input type="text" id="contactName" required placeholder="اسمك">
+                            <input type="text" id="contactName" name="الاسم" required placeholder="اسمك">
                         </div>
                         <div class="form-group">
                             <label for="contactEmail">البريد الإلكتروني</label>
-                            <input type="email" id="contactEmail" required placeholder="بريدك الإلكتروني">
+                            <input type="email" id="contactEmail" name="البريد الإلكتروني" required placeholder="بريدك الإلكتروني">
                         </div>
                         <div class="form-group">
                             <label for="contactMessage">الرسالة</label>
-                            <textarea id="contactMessage" required placeholder="اكتب رسالتك هنا..."></textarea>
+                            <textarea id="contactMessage" name="الرسالة" required placeholder="اكتب رسالتك هنا..."></textarea>
                         </div>
                         <button type="submit" class="btn btn-primary" style="width: 100%;">
                             <i class="fas fa-paper-plane"></i>
@@ -1655,12 +1655,39 @@
             }
         });
 
-        // Contact Form Submission
+        // Contact Form Submission with Formspree
         const contactForm = document.getElementById('contactForm');
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            alert('تم إرسال رسالتك بنجاح! سيتم الرد عليك قريبًا');
-            contactForm.reset();
+
+            const submitBtn = contactForm.querySelector('.submit-btn');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+            submitBtn.disabled = true;
+
+            try {
+                const formData = new FormData(contactForm);
+                const response = await fetch(contactForm.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    alert('تم إرسال رسالتك بنجاح! سيتم الرد عليك قريبًا');
+                    contactForm.reset();
+                } else {
+                    alert('حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.');
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
         });
 
         // FAQ Accordion
